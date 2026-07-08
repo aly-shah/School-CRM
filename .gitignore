@@ -1,0 +1,25 @@
+# dependencies
+educrm-app/node_modules/
+
+# next.js build output
+educrm-app/.next/
+educrm-app/out/
+educrm-app/next-env.d.ts
+
+# local environment
+educrm-app/.env.local
+educrm-app/.env*.local
+
+# local Postgres data directory (never commit the database cluster)
+pgdata/
+
+# logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# local Claude config
+.claude/
