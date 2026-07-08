@@ -101,3 +101,16 @@ CREATE TABLE IF NOT EXISTS notifications (
 -- audience: for staff portals a notification targets a portal id (e.g. 'teacher','finance');
 -- for student events `roll` is set and audience stays NULL (seen only by that student + their parent)
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS audience text;
+
+CREATE TABLE IF NOT EXISTS drivers (
+  id serial PRIMARY KEY,
+  name text NOT NULL,
+  cnic text,
+  phone text,
+  license_no text,
+  route text,
+  bus text,
+  photo text,
+  status text DEFAULT 'Active',
+  created_at timestamptz DEFAULT now()
+);

@@ -27,7 +27,11 @@ async function count(table) {
   return r.rows[0].n;
 }
 
-export async function POST() {
+export async function POST(req) {
+  // In production set SEED_SECRET; requests must send a matching x-seed-secret header.
+  if (process.env.SEED_SECRET && req.headers.get("x-seed-secret") !== process.env.SEED_SECRET) {
+    return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
+  }
   try {
     // 1. schema
     const sql = readFileSync(join(process.cwd(), "db/schema.sql"), "utf8");
@@ -119,8 +123,14 @@ export async function POST() {
         await q("INSERT INTO inventory_items (name,category,quantity,unit,min_stock) VALUES ($1,$2,$3,$4,$5)", [n, c, qn, u, m]);
     }
 
+    // 11. drivers
+    if ((await count("drivers")) === 0) {
+      await q(`INSERT INTO drivers (name,cnic,phone,license_no,route,bus,status) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+        ["Rashid Mehmood", "35201-1234567-1", "+92 300 8433445", "LHR-DL-99213", "Route 1 · North Loop", "LEB-4471", "Active"]);
+    }
+
     const summary = {};
-    for (const t of ["students", "staff", "classes", "quizzes", "messages", "homework", "library_books", "inventory_items"]) {
+    for (const t of ["students", "staff", "classes", "quizzes", "messages", "homework", "library_books", "inventory_items", "drivers"]) {
       summary[t] = await count(t);
     }
     return NextResponse.json({ ok: true, seeded: summary });

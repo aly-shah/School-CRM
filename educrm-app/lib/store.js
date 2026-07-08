@@ -23,6 +23,11 @@ export async function getPhoto(id) { const s = await getStudent(id); return s?.p
 export const getStaff = () => jget("/api/staff");
 export async function addStaff(m) { const { data } = await jsend("/api/staff", "POST", m); return data; }
 
+// ---- drivers ----
+export const getDrivers = () => jget("/api/drivers");
+export async function addDriver(d) { const { ok, data } = await jsend("/api/drivers", "POST", d); if (!ok) throw new Error(data.error || "Failed"); return data; }
+export async function setDriverPhoto(id, dataURL) { await jsend(`/api/drivers/${id}`, "PATCH", { photo: dataURL }); }
+
 // ---- classes / timetables ----
 export const getClasses = () => jget("/api/classes");
 export async function addClass(c) { const { ok, data } = await jsend("/api/classes", "POST", c); if (!ok) throw new Error(data.error || "Failed"); return data; }

@@ -46,6 +46,26 @@ curl -X POST http://localhost:3000/api/dev/seed
 
 Demo parent login → roll **12**, password **ayaan2025** (or set one from Admin → Students → a student's profile).
 
+## Deploy to a VPS (Ubuntu/Debian)
+
+One script sets up **Node, PostgreSQL, Nginx, PM2 and a Let's Encrypt SSL cert** and makes the site live.
+
+1. Point your domain's **DNS A-record** at the server's IP.
+2. On the server:
+
+```bash
+git clone https://github.com/aly-shah/School-CRM.git
+cd School-CRM
+sudo DOMAIN=crm.yourdomain.com EMAIL=you@yourdomain.com bash deploy.sh
+```
+
+That's it — it installs everything, creates a password-protected Postgres database, builds the app, runs it under PM2, configures Nginx as a reverse proxy, and issues HTTPS. Secrets (DB password, seed secret) are written to `educrm-app/.env.local`.
+
+**Redeploy / update:** `git pull && sudo bash deploy.sh`
+**Useful:** `pm2 status`, `pm2 logs educrm`
+
+Options (env vars): `DB_NAME`, `DB_USER`, `DB_PASS`, `APP_PORT`, `DO_SSL=no`, `DO_SEED=no`.
+
 ## Structure
 
 ```

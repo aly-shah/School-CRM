@@ -20,6 +20,7 @@ export const PORTALS = {
       { label: "Exams", href: "/admin/exams", icon: "exams" },
       { label: "Timetable", href: "/admin/timetable", icon: "timetable" },
       { label: "Library", href: "/admin/library", icon: "library" },
+      { label: "Transport", href: "/admin/transport", icon: "bus" },
       { label: "Parents", href: "/admin/parents", icon: "parents" },
       { label: "Reports", href: "/admin/reports", icon: "reports" },
     ],
