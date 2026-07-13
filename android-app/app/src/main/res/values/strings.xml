@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EduCRM 360</string>
+    <!-- The deployed CRM the app wraps. Change this to your domain if different. -->
+    <string name="app_url">https://school.scalamatic.com</string>
+</resources>

@@ -1,0 +1,54 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android-app/**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
+        run: sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Build debug APK
+        working-directory: android-app
+        run: |
+          gradle wrapper --gradle-version 8.7
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename artifact
+        run: cp android-app/app/build/outputs/apk/debug/app-debug.apk app.apk
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apk
+          path: app.apk
+
+      - name: Publish to release (stable download URL)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-latest
+          name: EduCRM 360 — Android App
+          body: "Latest EduCRM 360 Android app. Download: /releases/download/app-latest/app.apk"
+          files: app.apk
+          make_latest: true

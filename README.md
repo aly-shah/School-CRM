@@ -66,6 +66,17 @@ That's it — it installs everything, creates a password-protected Postgres data
 
 Options (env vars): `DB_NAME`, `DB_USER`, `DB_PASS`, `APP_PORT`, `DO_SSL=no`, `DO_SEED=no`.
 
+## Android app
+
+A native **WebView wrapper** (`android-app/`) packages the deployed site into an installable APK — so it has *every* CRM feature automatically, plus file uploads and GPS.
+
+- **GitHub Actions** (`.github/workflows/android.yml`) builds the APK on each push and publishes it to the **`app-latest`** release.
+- The site serves **`/app.apk`** (redirects to that release asset) and a friendly install page at **`/download`**.
+- So users just visit **`https://school.scalamatic.com/app.apk`** (or `/download`) to get the app.
+
+To point the app at a different domain, edit `app_url` in `android-app/app/src/main/res/values/strings.xml`.
+Requires the repo to be **public** (so the release asset is downloadable).
+
 ## Structure
 
 ```

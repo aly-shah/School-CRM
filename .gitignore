@@ -23,3 +23,14 @@ Thumbs.db
 
 # local Claude config
 .claude/
+
+# android build
+android-app/.gradle/
+android-app/build/
+android-app/app/build/
+android-app/local.properties
+android-app/.idea/
+android-app/gradlew
+android-app/gradlew.bat
+android-app/gradle/wrapper/gradle-wrapper.jar
+educrm-app/public/app.apk
