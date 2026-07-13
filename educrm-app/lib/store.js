@@ -28,6 +28,11 @@ export const getDrivers = () => jget("/api/drivers");
 export async function addDriver(d) { const { ok, data } = await jsend("/api/drivers", "POST", d); if (!ok) throw new Error(data.error || "Failed"); return data; }
 export async function setDriverPhoto(id, dataURL) { await jsend(`/api/drivers/${id}`, "PATCH", { photo: dataURL }); }
 
+// ---- vehicle safety checklist ----
+export const getVehicleCheck = (bus) => jget(`/api/vehicle-checks?bus=${encodeURIComponent(bus)}`);
+export const getVehicleChecks = () => jget(`/api/vehicle-checks`);
+export async function submitVehicleCheck(d) { const { data } = await jsend("/api/vehicle-checks", "POST", d); return data; }
+
 // ---- classes / timetables ----
 export const getClasses = () => jget("/api/classes");
 export async function addClass(c) { const { ok, data } = await jsend("/api/classes", "POST", c); if (!ok) throw new Error(data.error || "Failed"); return data; }

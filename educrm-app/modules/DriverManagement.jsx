@@ -2,19 +2,21 @@
 import { useEffect, useState } from "react";
 import { PageHeader, StatTile, Card, Pill, Avatar } from "@/components/ui";
 import { I } from "@/components/icons";
-import { getDrivers, addDriver } from "@/lib/store";
+import { getDrivers, addDriver, getVehicleChecks } from "@/lib/store";
 
 const inp = { padding: "9px 11px", border: "1px solid var(--line)", borderRadius: 9, fontSize: 13.5, fontFamily: "inherit", background: "var(--panel)", color: "var(--ink)", minWidth: 0, boxSizing: "border-box" };
 const blank = { name: "", cnic: "", phone: "", license_no: "", route: "", bus: "" };
 
 export default function DriverManagement() {
   const [list, setList] = useState([]);
+  const [checks, setChecks] = useState([]);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState(blank);
   const [photo, setPhoto] = useState(null);
   const [err, setErr] = useState("");
 
-  useEffect(() => { getDrivers().then(setList); }, []);
+  useEffect(() => { getDrivers().then(setList); getVehicleChecks().then(setChecks); }, []);
+  const checkFor = (bus) => checks.find((c) => c.bus === bus);
 
   const onPhoto = (e) => {
     const f = e.target.files?.[0];
@@ -91,7 +93,14 @@ export default function DriverManagement() {
               <Row k="Licence" v={d.license_no || "—"} />
               <Row k="Bus" v={d.bus || "—"} />
             </div>
-            <div style={{ marginTop: 12 }}><Pill kind={d.status === "Active" ? "good" : "mute"} dot>{d.status}</Pill></div>
+            <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <Pill kind={d.status === "Active" ? "good" : "mute"} dot>{d.status}</Pill>
+              {(() => {
+                const c = checkFor(d.bus);
+                if (!c) return <Pill kind="mute">No inspection</Pill>;
+                return <Pill kind={c.status === "Pass" ? "good" : "bad"} dot>Vehicle: {c.status}</Pill>;
+              })()}
+            </div>
           </div>
         ))}
       </div>

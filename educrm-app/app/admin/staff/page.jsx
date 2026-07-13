@@ -1,4 +1,4 @@
 import StaffDirectory from "@/modules/StaffDirectory";
 export default function Page() {
-  return <StaffDirectory />;
+  return <StaffDirectory linkBase="/admin/staff" />;
 }

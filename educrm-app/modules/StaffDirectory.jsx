@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { PageHeader, StatTile, Card, Pill, Avatar, Table } from "@/components/ui";
 import { I } from "@/components/icons";
 import { getStaff, addStaff } from "@/lib/store";
@@ -7,7 +8,7 @@ import { getStaff, addStaff } from "@/lib/store";
 const inp = { padding: "9px 11px", border: "1px solid var(--line)", borderRadius: 9, fontSize: 13.5, fontFamily: "inherit", background: "var(--panel)", color: "var(--ink)", minWidth: 0 };
 const DEPTS = ["Academics", "Finance", "Operations", "Administration"];
 
-export default function StaffDirectory({ showStats = true }) {
+export default function StaffDirectory({ showStats = true, linkBase }) {
   const [list, setList] = useState([]);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: "", role: "", dept: "Academics", phone: "" });
@@ -57,13 +58,13 @@ export default function StaffDirectory({ showStats = true }) {
 
       <Card title="Staff directory" pad={false}>
         <Table
-          minWidth={640}
+          minWidth={480}
           rows={list}
           cols={[
-            { label: "Name", render: (m) => <div className="who"><Avatar name={m.name} size={32} /><span className="nm">{m.name}</span></div> },
+            { label: "Name", render: (m) => linkBase
+              ? <Link href={`${linkBase}/${m.id}`} className="who"><Avatar name={m.name} size={32} /><span className="nm">{m.name}</span></Link>
+              : <div className="who"><Avatar name={m.name} size={32} /><span className="nm">{m.name}</span></div> },
             { label: "Role", render: (m) => <span className="soft">{m.role}</span> },
-            { label: "Department", render: (m) => <span className="soft">{m.dept}</span> },
-            { label: "Phone", render: (m) => <span className="soft tnum">{m.phone}</span> },
             { label: "Status", align: "r", render: (m) => <Pill kind={m.status === "On duty" ? "good" : "warn"} dot>{m.status}</Pill> },
           ]}
         />

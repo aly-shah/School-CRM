@@ -114,3 +114,13 @@ CREATE TABLE IF NOT EXISTS drivers (
   status text DEFAULT 'Active',
   created_at timestamptz DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS vehicle_checks (
+  id serial PRIMARY KEY,
+  bus text,
+  driver text,
+  items jsonb NOT NULL DEFAULT '[]',
+  note text,
+  status text,                     -- 'Pass' or 'Attention'
+  submitted_at timestamptz DEFAULT now()
+);

@@ -90,7 +90,7 @@ export default function StudentsTable({ base = "/admin" }) {
         </div>
 
         <Table
-          minWidth={720}
+          minWidth={480}
           rows={rows}
           empty="No students match your search."
           cols={[
@@ -102,10 +102,7 @@ export default function StudentsTable({ base = "/admin" }) {
             ) },
             { label: "Admission #", render: (s) => <span className="soft tnum">{s.id}</span> },
             { label: "Class", render: (s) => <span className="soft">{s.grade}</span> },
-            { label: "Status", render: (s) => <Pill kind={s.status === "Active" ? "good" : "mute"} dot>{s.status}</Pill> },
-            { label: "Attendance", align: "r", render: (s) => <span className="tnum" style={{ color: s.attendance < 75 ? "var(--bad)" : "var(--ink)" }}>{s.attendance}%</span> },
-            { label: "Overall", align: "r", render: (s) => <span className="tnum">{s.overall}%</span> },
-            { label: "Fees due", align: "r", render: (s) => <span className="tnum" style={{ fontWeight: 700, color: s.feeDue ? "var(--warn)" : "var(--good)" }}>{s.feeDue ? pkr(s.feeDue) : "Cleared"}</span> },
+            { label: "Status", align: "r", render: (s) => <Pill kind={s.status === "Active" ? "good" : "mute"} dot>{s.status}</Pill> },
           ]}
         />
       </div>
