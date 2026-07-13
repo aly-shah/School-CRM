@@ -13,6 +13,7 @@ export default function PortalShell({ portal, children }) {
   const cfg = PORTALS[portal];
   const path = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("educrm_sidebar_collapsed");
@@ -24,6 +25,11 @@ export default function PortalShell({ portal, children }) {
   const home = `/${cfg.id}`;
   const active = (href) => (href === home ? path === href : path === href || path.startsWith(href + "/"));
   const title = cfg.nav.find((n) => active(n.href))?.label || cfg.name;
+
+  // bottom nav (mobile): show up to 5 items, or 4 + "More"
+  const showMore = cfg.nav.length > 5;
+  const primary = showMore ? cfg.nav.slice(0, 4) : cfg.nav;
+  const moreActive = showMore && cfg.nav.slice(4).some((n) => active(n.href));
 
   return (
     <div className="app" style={{ gridTemplateColumns: `${collapsed ? 78 : 236}px 1fr`, ["--accent"]: cfg.accent, ["--accent-weak"]: cfg.accent + "1f", ["--accent-ink"]: cfg.accent }}>
@@ -69,6 +75,37 @@ export default function PortalShell({ portal, children }) {
         </div>
         <div className="content">{children}</div>
       </div>
+
+      {/* mobile bottom navigation */}
+      <nav className="bottomnav">
+        {primary.map((n) => (
+          <Link key={n.href} href={n.href} className={`bn-i ${active(n.href) ? "active" : ""}`}>
+            {I[n.icon]}<span>{n.label}</span>
+          </Link>
+        ))}
+        {showMore && (
+          <button className={`bn-i ${moreActive ? "active" : ""}`} onClick={() => setMoreOpen(true)}>
+            {I.grid}<span>More</span>
+          </button>
+        )}
+      </nav>
+
+      {moreOpen && (
+        <>
+          <div className="more-overlay" onClick={() => setMoreOpen(false)} />
+          <div className="more-sheet">
+            <div className="grip" />
+            <div className="more-grid">
+              {cfg.nav.map((n) => (
+                <Link key={n.href} href={n.href} className={active(n.href) ? "active" : ""} onClick={() => setMoreOpen(false)}>
+                  {I[n.icon]}<span>{n.label}</span>
+                </Link>
+              ))}
+              <Link href="/" onClick={() => setMoreOpen(false)}>{I.swap}<span>Switch portal</span></Link>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
