@@ -1,23 +1,27 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Avatar } from "@/components/ui";
 import { I } from "@/components/icons";
 import { getStudents, getTeacherSession, saveSwipeAttendance } from "@/lib/store";
 import { firstClass } from "@/lib/classes";
 
-const OUT = { P: "translateX(135%) rotate(16deg)", A: "translateX(-135%) rotate(-16deg)", L: "translateY(-135%) rotate(-4deg)" };
+const OUT = { P: "translate(135%,-6%) rotate(20deg)", A: "translate(-135%,-6%) rotate(-20deg)", L: "translateY(-135%) rotate(-4deg)" };
 const TH = 95; // px threshold to count a swipe
 
-const CallIcon = <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" /></svg>;
+const initials = (n) => n.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+// stable warm/cool gradient per student for the photo-less fallback
+const grad = (n) => {
+  let h = 0; for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 360;
+  return `linear-gradient(150deg, hsl(${h} 62% 52%), hsl(${(h + 40) % 360} 64% 38%))`;
+};
 
 export default function SwipeAttendance() {
   const [grade, setGrade] = useState(null);
   const [deck, setDeck] = useState(null);
   const [i, setI] = useState(0);
-  const [marks, setMarks] = useState({});      // roll -> {status, name, phone}
-  const [hist, setHist] = useState([]);         // rolls in order marked (for undo)
+  const [marks, setMarks] = useState({});
+  const [hist, setHist] = useState([]);
   const [drag, setDrag] = useState({ x: 0, y: 0, active: false });
-  const [fly, setFly] = useState(null);         // 'P' | 'A' | 'L' while animating out
+  const [fly, setFly] = useState(null);
   const [saved, setSaved] = useState(false);
   const start = useRef({ x: 0, y: 0 });
 
@@ -29,7 +33,6 @@ export default function SwipeAttendance() {
 
   const cur = deck?.[i];
   const done = deck && i >= deck.length;
-
   const guardian = (s) => s.parent || s.father || null;
 
   const throwCard = (status) => {
@@ -38,7 +41,7 @@ export default function SwipeAttendance() {
     setMarks((m) => ({ ...m, [cur.roll]: { status, name: cur.name, phone: g?.phone || null } }));
     setHist((h) => [...h, cur.roll]);
     setFly(status);
-    setTimeout(() => { setI((x) => x + 1); setDrag({ x: 0, y: 0, active: false }); setFly(null); }, 270);
+    setTimeout(() => { setI((x) => x + 1); setDrag({ x: 0, y: 0, active: false }); setFly(null); }, 280);
   };
 
   const undo = () => {
@@ -50,7 +53,6 @@ export default function SwipeAttendance() {
     setFly(null); setDrag({ x: 0, y: 0, active: false }); setSaved(false);
   };
 
-  // ---- pointer drag on the top card ----
   const onDown = (e) => { if (fly) return; start.current = { x: e.clientX, y: e.clientY }; setDrag({ x: 0, y: 0, active: true }); e.currentTarget.setPointerCapture?.(e.pointerId); };
   const onMove = (e) => { if (!drag.active) return; setDrag({ x: e.clientX - start.current.x, y: e.clientY - start.current.y, active: true }); };
   const onUp = () => {
@@ -63,8 +65,7 @@ export default function SwipeAttendance() {
   };
 
   const save = async () => {
-    const entries = Object.entries(marks).map(([roll, v]) => ({ roll, ...v }));
-    await saveSwipeAttendance(grade, entries);
+    await saveSwipeAttendance(grade, Object.entries(marks).map(([roll, v]) => ({ roll, ...v })));
     setSaved(true);
   };
 
@@ -77,23 +78,17 @@ export default function SwipeAttendance() {
     <div className="swipe-wrap">
       <div className="swipe-progress">
         <span>{grade} · {Math.min(i, deck.length)}/{deck.length} marked</span>
-        <div className="swipe-mini">
-          <span className="good">{counts.P || 0} P</span>
-          <span className="bad">{counts.A || 0} A</span>
-          <span className="warn">{counts.L || 0} L</span>
-        </div>
+        <div className="swipe-mini"><span className="good">{counts.P || 0} P</span><span className="bad">{counts.A || 0} A</span><span className="warn">{counts.L || 0} L</span></div>
       </div>
 
       {!done ? (
         <>
           <div className="swipe-deck">
-            {/* stacked peek cards behind */}
             {deck.slice(i + 1, i + 3).reverse().map((s, idx, arr) => {
-              const depth = arr.length - idx; // 1 = closest behind
-              return <div key={s.roll} className="swipe-card peek" style={{ transform: `scale(${1 - depth * 0.04}) translateY(${depth * 12}px)`, zIndex: 1 }} />;
+              const depth = arr.length - idx;
+              return <div key={s.roll} className="swipe-card peek" style={{ transform: `scale(${1 - depth * 0.045}) translateY(${depth * 14}px)`, zIndex: 1 }} />;
             })}
 
-            {/* top card */}
             {cur && (
               <div
                 className="swipe-card top"
@@ -101,25 +96,28 @@ export default function SwipeAttendance() {
                 style={{
                   zIndex: 5,
                   transform: fly ? OUT[fly] : `translate(${drag.x}px, ${drag.y}px) rotate(${drag.x / 22}deg)`,
-                  transition: drag.active ? "none" : "transform .27s cubic-bezier(.2,.7,.3,1)",
-                  opacity: fly ? 0 : 1,
+                  transition: drag.active ? "none" : "transform .28s cubic-bezier(.2,.7,.3,1)",
                 }}
               >
-                <Stamp show={drag.x > 30 && !fly} kind="good" x={drag.x} label="PRESENT" pos="left" />
-                <Stamp show={drag.x < -30 && !fly} kind="bad" x={-drag.x} label="ABSENT" pos="right" />
-                <Stamp show={drag.y < -30 && Math.abs(drag.y) > Math.abs(drag.x) && !fly} kind="warn" x={-drag.y} label="ON LEAVE" pos="top" />
+                {/* full-bleed photo (or gradient + initials) */}
+                {cur.photo
+                  ? <img className="swipe-img" src={cur.photo} alt={cur.name} draggable="false" />
+                  : <div className="swipe-img fallback" style={{ background: grad(cur.name) }}><span className="swipe-initials">{initials(cur.name)}</span></div>}
+                <div className="swipe-scrim" />
 
-                <div className="swipe-photo">
-                  {cur.photo ? <img src={cur.photo} alt={cur.name} draggable="false" /> : <Avatar name={cur.name} size={128} radius fs={44} />}
-                </div>
-                <div className="swipe-body">
-                  <div className="swipe-name">{cur.name}</div>
-                  <div className="swipe-sub">Roll {cur.roll} · {cur.grade} · {cur.gender}</div>
-                  <div className="swipe-info">
-                    <Row k="Guardian" v={guardian(cur)?.name || "—"} />
-                    <Row k="Contact" v={guardian(cur)?.phone || "—"} icon={CallIcon} />
-                    <Row k="Attendance" v={`${cur.attendance ?? "—"}% term`} />
-                    {cur.medical && <Row k="Medical" v={cur.medical} wrap />}
+                {/* drag stamps */}
+                <span className="swipe-stamp good" style={{ top: 22, left: 20, transform: "rotate(-18deg)", opacity: Math.min(1, Math.max(0, drag.x) / 90) }}>PRESENT</span>
+                <span className="swipe-stamp bad" style={{ top: 22, right: 20, transform: "rotate(18deg)", opacity: Math.min(1, Math.max(0, -drag.x) / 90) }}>ABSENT</span>
+                <span className="swipe-stamp warn" style={{ bottom: 150, left: "50%", transform: "translateX(-50%) rotate(-6deg)", opacity: Math.min(1, Math.max(0, -drag.y - Math.abs(drag.x)) / 80) }}>ON&nbsp;LEAVE</span>
+
+                {/* info overlaid on the photo */}
+                <div className="swipe-overlay">
+                  <div className="swipe-name">{cur.name}<span className="roll">#{cur.roll}</span></div>
+                  <div className="swipe-meta">{cur.grade} · {cur.gender} · {cur.attendance ?? "—"}% attendance</div>
+                  <div className="swipe-chips">
+                    {guardian(cur)?.name && <span className="swipe-chip">{ICON_USER}{guardian(cur).name}</span>}
+                    {guardian(cur)?.phone && <span className="swipe-chip">{ICON_PHONE}{guardian(cur).phone}</span>}
+                    {cur.medical && <span className="swipe-chip warn">{ICON_MED}Medical note</span>}
                   </div>
                 </div>
               </div>
@@ -129,11 +127,12 @@ export default function SwipeAttendance() {
           <div className="swipe-hint">Swipe → present · ← absent · ↑ on leave</div>
 
           <div className="swipe-acts">
-            <button className="swipe-btn bad" onClick={() => throwCard("A")} aria-label="Absent"><span>✕</span>Absent</button>
-            <button className="swipe-btn warn" onClick={() => throwCard("L")} aria-label="On leave"><span>↑</span>Leave</button>
-            <button className="swipe-btn good" onClick={() => throwCard("P")} aria-label="Present"><span>✓</span>Present</button>
+            <button className="tinder-btn undo" onClick={undo} disabled={!hist.length} aria-label="Undo">↩</button>
+            <button className="tinder-btn nope" onClick={() => throwCard("A")} aria-label="Absent">✕</button>
+            <button className="tinder-btn leave" onClick={() => throwCard("L")} aria-label="On leave">↑</button>
+            <button className="tinder-btn like" onClick={() => throwCard("P")} aria-label="Present">✓</button>
           </div>
-          <button className="btn" onClick={undo} disabled={!hist.length} style={{ margin: "14px auto 0", display: "flex" }}>↩ Undo last</button>
+          <div className="swipe-legend"><span className="bad">Absent</span><span className="warn">Leave</span><span className="good">Present</span></div>
         </>
       ) : (
         <div className="card card-pad" style={{ textAlign: "center" }}>
@@ -155,29 +154,10 @@ export default function SwipeAttendance() {
   );
 }
 
-function Stamp({ show, kind, x, label, pos }) {
-  if (!show) return null;
-  const rot = pos === "left" ? -14 : pos === "right" ? 14 : 0;
-  const p = pos === "left" ? { left: 16 } : pos === "right" ? { right: 16 } : { left: "50%", transform: "translateX(-50%)" };
-  return (
-    <span className="swipe-stamp" style={{ top: pos === "top" ? "auto" : 18, bottom: pos === "top" ? 24 : "auto", ...p, color: `var(--${kind})`, borderColor: `var(--${kind})`, opacity: Math.min(1, x / 90), transform: `${p.transform || ""} rotate(${rot}deg)` }}>
-      {label}
-    </span>
-  );
-}
-function Row({ k, v, icon, wrap }) {
-  return (
-    <div className="swipe-row">
-      <span className="k">{k}</span>
-      <span className="v" style={wrap ? { whiteSpace: "normal", textAlign: "right" } : {}}>{icon && <span style={{ display: "inline-flex", verticalAlign: "-2px", marginRight: 5, color: "var(--muted)" }}>{icon}</span>}{v}</span>
-    </div>
-  );
-}
+const ICON_USER = <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="3.2" /><path d="M5 20c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5" /></svg>;
+const ICON_PHONE = <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" /></svg>;
+const ICON_MED = <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14" /></svg>;
+
 function Tot({ n, label, kind }) {
-  return (
-    <div className="swipe-tot">
-      <div className="n" style={{ color: `var(--${kind})` }}>{n}</div>
-      <div className="l">{label}</div>
-    </div>
-  );
+  return <div className="swipe-tot"><div className="n" style={{ color: `var(--${kind})` }}>{n}</div><div className="l">{label}</div></div>;
 }
