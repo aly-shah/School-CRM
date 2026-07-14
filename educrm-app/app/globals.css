@@ -77,6 +77,11 @@ a{ color:inherit; text-decoration:none; }
 /* let grid/flex items shrink so wide children (tables) scroll inside their own box instead of pushing the page */
 .grid>*, .tiles>*, .g-2>*, .g-3>*, .g-4>*{ min-width:0; }
 
+/* WhatsApp click-to-chat button */
+.wa-btn{ display:inline-flex; align-items:center; gap:6px; background:#25d366; border-color:#25d366; color:#0b3d1f; font-weight:700; }
+.wa-btn:hover{ background:#1fbe5b; border-color:#1fbe5b; }
+.wa-btn svg{ color:#0b3d1f; }
+
 /* name-only list for mobile (students): hidden on desktop, shown ≤600px */
 .mobile-slist{ display:none; }
 .slist-row{ display:flex; align-items:center; gap:12px; padding:13px 15px; border-bottom:1px solid var(--line-soft); color:var(--ink); text-decoration:none; }

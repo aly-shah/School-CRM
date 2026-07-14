@@ -1,6 +1,7 @@
-import { PageHeader, StatTile, Card, Donut, Pill, Avatar, Table } from "@/components/ui";
+import { PageHeader, StatTile, Card, Donut } from "@/components/ui";
 import { I } from "@/components/icons";
-import { feeMonths, defaulters, pkr } from "@/lib/data";
+import { feeMonths } from "@/lib/data";
+import DefaultersTable from "@/modules/DefaultersTable";
 
 export default function FeesOverview({ title = "Fees & Finance", subtitle = "Real-time collection — no more month-end guesswork" }) {
   return (
@@ -42,18 +43,7 @@ export default function FeesOverview({ title = "Fees & Finance", subtitle = "Rea
         </Card>
       </div>
 
-      <Card title="Defaulters" link="Send reminders" pad={false}>
-        <Table
-          rows={defaulters}
-          cols={[
-            { label: "Student", render: (d) => <div className="who"><Avatar name={d.name} size={30} /><span className="nm">{d.name}</span></div> },
-            { label: "Class", render: (d) => <span className="soft">{d.grade}</span> },
-            { label: "Overdue by", align: "r", render: (d) => <Pill kind={d.days > 30 ? "bad" : d.days > 10 ? "warn" : "mute"}>{d.days} days</Pill> },
-            { label: "Amount", align: "r", render: (d) => <span className="tnum" style={{ fontWeight: 700 }}>{pkr(d.due)}</span> },
-            { label: "Action", align: "r", render: () => <button className="btn" style={{ padding: "6px 12px" }}>Remind</button> },
-          ]}
-        />
-      </Card>
+      <DefaultersTable />
     </>
   );
 }

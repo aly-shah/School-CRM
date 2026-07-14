@@ -55,6 +55,17 @@ export async function POST(req) {
       );
     }
 
+    // 2b. backfill guardian contact for demo students (only where still blank)
+    for (const s of students) {
+      const g = s.parent || s.father;
+      if (!g?.phone) continue;
+      await q(
+        `UPDATE students SET parent_name=COALESCE(parent_name,$2), parent_rel=COALESCE(parent_rel,$3), parent_phone=COALESCE(parent_phone,$4)
+         WHERE id=$1 AND parent_phone IS NULL`,
+        [s.id, g.name || null, s.parent?.rel || "Guardian", g.phone]
+      );
+    }
+
     // 3. staff (only if empty)
     if ((await count("staff")) === 0) {
       for (const m of staff) {

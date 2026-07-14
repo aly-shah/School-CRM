@@ -1,34 +1,27 @@
-import { PageHeader, StatTile, Card, Pill, Avatar, Table } from "@/components/ui";
+"use client";
+import { useState } from "react";
+import { PageHeader, StatTile } from "@/components/ui";
 import { I } from "@/components/icons";
-import { defaulters, pkr } from "@/lib/data";
+import { pkr } from "@/lib/data";
+import DefaultersTable from "@/modules/DefaultersTable";
 
 export default function Defaulters() {
-  const total = defaulters.reduce((a, b) => a + b.due, 0);
+  const [rows, setRows] = useState([]);
+  const total = rows.reduce((a, b) => a + Number(b.fees?.due || b.feeDue || 0), 0);
+  const big = rows.filter((s) => Number(s.fees?.due || s.feeDue || 0) >= 50000).length;
+
   return (
     <>
-      <PageHeader title="Defaulters" subtitle="Outstanding dues — chase and recover">
-        <button className="btn primary"><span style={{ display: "flex" }}>{I.msg}</span>Remind all</button>
-      </PageHeader>
+      <PageHeader title="Defaulters" subtitle="Outstanding dues — notify students & parents, one tap on WhatsApp" />
 
       <div className="tiles" style={{ marginBottom: 20 }}>
-        <StatTile label="Total overdue" tint={{}} value={pkr(total)} sub={`${defaulters.length} students`} />
-        <StatTile label="Over 30 days" tint={{}} value="1" sub="escalate" />
-        <StatTile label="Reminders sent" tint={{}} value="184" sub="this month" />
-        <StatTile label="Recovered (mo.)" tint={{}} value="Rs 12.4 L" sub="after reminders" />
+        <StatTile label="Total overdue" icon={I.fees} tint={{ bg: "var(--bad-bg)", fg: "var(--bad)" }} value={pkr(total)} sub={`${rows.length} students`} />
+        <StatTile label="Large dues" icon={I.clock} tint={{ bg: "var(--warn-bg)", fg: "var(--warn)" }} value={big} sub="≥ Rs 50,000" />
+        <StatTile label="Reminders sent" icon={I.bell} tint={{ bg: "var(--info-bg)", fg: "var(--info)" }} value="184" sub="this month" />
+        <StatTile label="Recovered (mo.)" icon={I.check} tint={{ bg: "var(--good-bg)", fg: "var(--good)" }} value="Rs 12.4 L" sub="after reminders" />
       </div>
 
-      <Card pad={false}>
-        <Table
-          rows={defaulters}
-          cols={[
-            { label: "Student", render: (d) => <div className="who"><Avatar name={d.name} size={30} /><span className="nm">{d.name}</span></div> },
-            { label: "Class", render: (d) => <span className="soft">{d.grade}</span> },
-            { label: "Overdue by", align: "r", render: (d) => <Pill kind={d.days > 30 ? "bad" : d.days > 10 ? "warn" : "mute"}>{d.days} days</Pill> },
-            { label: "Amount", align: "r", render: (d) => <span className="tnum" style={{ fontWeight: 700 }}>{pkr(d.due)}</span> },
-            { label: "Action", align: "r", render: () => <button className="btn" style={{ padding: "6px 12px" }}>Remind</button> },
-          ]}
-        />
-      </Card>
+      <DefaultersTable onCount={setRows} />
     </>
   );
 }

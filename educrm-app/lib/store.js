@@ -107,6 +107,12 @@ export async function markNotificationsRead(t = {}) {
   await jsend("/api/notifications", "PATCH", t.roll ? { roll: t.roll } : { audience: t.audience });
 }
 
+// ---- fee reminders (files an in-app notification for each student + their parent) ----
+export async function remindFees(items) {
+  const { data } = await jsend("/api/fees/remind", "POST", { items });
+  return data?.sent || 0;
+}
+
 // ---- parent session (client-only token) ----
 const K_SESSION = "educrm_parent_session";
 export function setSession(roll) { if (typeof window !== "undefined") localStorage.setItem(K_SESSION, JSON.stringify(String(roll))); }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Donut, Pill, gradeClass } from "@/components/ui";
 import { I } from "@/components/icons";
+import WaButton from "@/components/WaButton";
 import { pkr } from "@/lib/data";
 import { getStudent, setPhoto } from "@/lib/store";
 import ParentAccess from "@/components/ParentAccess";
@@ -82,6 +83,8 @@ export default function StudentProfile({ id, base = "/admin" }) {
             </div>
             <div className="prof-acts">
               <button className="btn primary">{I.msg}Message</button>
+              <WaButton phone={parent.phone} label="WhatsApp guardian"
+                text={`Assalam-o-Alaikum ${parent.name}. This is EduCRM 360 School regarding your child ${s.name} (Class ${s.grade}).`} />
               <button className="btn">{I.fees}Collect fee</button>
               <button className="btn sq" aria-label="Edit">{I.edit}</button>
             </div>
