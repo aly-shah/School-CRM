@@ -89,22 +89,37 @@ export default function StudentsTable({ base = "/admin" }) {
           <span className="muted" style={{ marginLeft: "auto", fontSize: 12.5 }}>{rows.length} shown</span>
         </div>
 
-        <Table
-          minWidth={480}
-          rows={rows}
-          empty="No students match your search."
-          cols={[
-            { label: "Student", render: (s) => (
-              <Link href={`${base}/students/${s.id}`} className="who">
-                <Avatar name={s.name} size={32} />
-                <span><span className="nm">{s.name}</span><br /><span className="sc">Roll {s.roll} · {s.gender}</span></span>
-              </Link>
-            ) },
-            { label: "Admission #", render: (s) => <span className="soft tnum">{s.id}</span> },
-            { label: "Class", render: (s) => <span className="soft">{s.grade}</span> },
-            { label: "Status", align: "r", render: (s) => <Pill kind={s.status === "Active" ? "good" : "mute"} dot>{s.status}</Pill> },
-          ]}
-        />
+        {/* Desktop / tablet: full table */}
+        <div className="slist-desktop">
+          <Table
+            minWidth={480}
+            rows={rows}
+            empty="No students match your search."
+            cols={[
+              { label: "Student", render: (s) => (
+                <Link href={`${base}/students/${s.id}`} className="who">
+                  <Avatar name={s.name} size={32} />
+                  <span><span className="nm">{s.name}</span><br /><span className="sc">Roll {s.roll} · {s.gender}</span></span>
+                </Link>
+              ) },
+              { label: "Admission #", render: (s) => <span className="soft tnum">{s.id}</span> },
+              { label: "Class", render: (s) => <span className="soft">{s.grade}</span> },
+              { label: "Status", align: "r", render: (s) => <Pill kind={s.status === "Active" ? "good" : "mute"} dot>{s.status}</Pill> },
+            ]}
+          />
+        </div>
+
+        {/* Mobile: name-only list, tap a name to open the profile */}
+        <div className="mobile-slist">
+          {rows.length === 0 && <div className="soft" style={{ padding: 16 }}>No students match your search.</div>}
+          {rows.map((s) => (
+            <Link key={s.id} href={`${base}/students/${s.id}`} className="slist-row">
+              <Avatar name={s.name} size={34} />
+              <span className="slist-nm">{s.name}</span>
+              <span className="slist-ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6l6 6-6 6" /></svg></span>
+            </Link>
+          ))}
+        </div>
       </div>
     </>
   );
