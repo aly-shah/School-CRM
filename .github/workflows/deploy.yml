@@ -23,22 +23,54 @@ jobs:
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Auto-deploy skipped — set all three secrets: VPS_HOST, VPS_USER, VPS_SSH_KEY."
+            echo "::notice::Auto-deploy skipped — set VPS_HOST, VPS_USER, VPS_SSH_KEY."
           fi
 
-      - name: Redeploy over SSH
+      - name: Checkout
         if: steps.cfg.outputs.ready == 'true'
-        uses: appleboy/ssh-action@v1.2.0
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        if: steps.cfg.outputs.ready == 'true'
+        uses: actions/setup-node@v4
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
-          script: |
-            set -e
-            D="${{ secrets.VPS_APP_DIR }}"
-            [ -n "$D" ] || D="$HOME/School-CRM"
-            git config --global --add safe.directory "$D" 2>/dev/null || true
-            cd "$D"
-            git pull --ff-only
-            bash update.sh
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: educrm-app/package-lock.json
+
+      - name: Build (in CI, not on the server)
+        if: steps.cfg.outputs.ready == 'true'
+        working-directory: educrm-app
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare SSH
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -p "${{ secrets.VPS_PORT || 22 }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Ensure rsync on server
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "${{ secrets.VPS_PORT || 22 }}" "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            'command -v rsync >/dev/null 2>&1 || (apt-get update -y && apt-get install -y rsync)'
+
+      - name: Rsync build to server
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          DEST="${{ secrets.VPS_APP_DIR || '/var/www/School-CRM' }}/educrm-app/"
+          rsync -az --delete \
+            --exclude 'node_modules' --exclude '.git' --exclude '.env.local' --exclude '.env*.local' \
+            --exclude '.lockhash' --exclude '.next/cache' \
+            -e "ssh -i ~/.ssh/id_deploy -p ${{ secrets.VPS_PORT || 22 }}" \
+            educrm-app/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:$DEST"
+
+      - name: Apply schema & restart
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          ssh -i ~/.ssh/id_deploy -p "${{ secrets.VPS_PORT || 22 }}" "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "bash ${{ secrets.VPS_APP_DIR || '/var/www/School-CRM' }}/educrm-app/restart.sh"

@@ -41,7 +41,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 log "Installing base packages"
 apt-get update -y
-apt-get install -y curl git ufw ca-certificates gnupg openssl
+apt-get install -y curl git ufw ca-certificates gnupg openssl rsync
 
 log "Node.js ${NODE_MAJOR} (if missing/old)"
 if ! command -v node >/dev/null 2>&1 || [ "$(node -v | sed 's/v//' | cut -d. -f1)" -lt 18 ]; then
