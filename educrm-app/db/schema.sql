@@ -48,6 +48,9 @@ CREATE TABLE IF NOT EXISTS homework (
   attach_name text, attach_type text, attach_data text, status text DEFAULT 'Open',
   created_at timestamptz DEFAULT now()
 );
+-- which teacher assigned it (so submissions notify that teacher specifically)
+ALTER TABLE homework ADD COLUMN IF NOT EXISTS teacher_id int;
+ALTER TABLE homework ADD COLUMN IF NOT EXISTS teacher_name text;
 
 CREATE TABLE IF NOT EXISTS homework_submissions (
   homework_id text, roll text, submitted_at timestamptz DEFAULT now(),

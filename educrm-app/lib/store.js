@@ -102,9 +102,9 @@ export async function adjustInventory(id, delta) { await jsend("/api/inventory",
 
 // ---- notifications (scoped by student roll, or by staff portal audience) ----
 export const getNotifications = (t = {}) =>
-  jget(`/api/notifications?${t.roll ? `roll=${t.roll}` : `audience=${t.audience || ""}`}`);
+  jget(`/api/notifications?${t.roll ? `roll=${t.roll}` : `audience=${t.audience || ""}${t.tid ? `&tid=${t.tid}` : ""}`}`);
 export async function markNotificationsRead(t = {}) {
-  await jsend("/api/notifications", "PATCH", t.roll ? { roll: t.roll } : { audience: t.audience });
+  await jsend("/api/notifications", "PATCH", t.roll ? { roll: t.roll } : { audience: t.audience, tid: t.tid });
 }
 
 // ---- fee reminders (files an in-app notification for each student + their parent) ----

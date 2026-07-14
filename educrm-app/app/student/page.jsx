@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader, Card, StatTile, Pill } from "@/components/ui";
 import { I } from "@/components/icons";
 import { students, timetable, subjectColor } from "@/lib/data";
+import ClassTeacherCard from "@/components/ClassTeacherCard";
 
 export default function StudentOverview() {
   const me = students[0]; // Ayaan
@@ -19,22 +20,8 @@ export default function StudentOverview() {
         <StatTile label="Overall" icon={I.star} tint={{ bg: "var(--info-bg)", fg: "var(--info)" }} value={`${me.overall}%`} sub={`Grade ${me.grade_letter} · rank ${me.rank}`} />
       </div>
 
-      <div className="grid g-2">
-        <Card title="Today's classes" link="Timetable">
-          <div className="list">
-            {today.map((subj, i) => {
-              const c = subjectColor[subj] || "var(--muted)";
-              return (
-                <div key={i} className="list-row">
-                  <span className="l-ic" style={{ background: `${c}18`, color: c }}><span style={{ display: "grid", placeItems: "center" }}>{I.book}</span></span>
-                  <div className="l-main"><div className="l-t">{subj}</div><div className="l-s">Period {i + 1}</div></div>
-                  <div className="l-end"><Pill kind="mute">{timetable.periods[i]}</Pill></div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
+      <div className="grid g-2" style={{ marginBottom: 20 }}>
+        <ClassTeacherCard grade={me.grade} />
         <Card title="Quick links">
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Link href="/student/homework" className="btn">{I.clipboard}My homework</Link>
@@ -45,6 +32,21 @@ export default function StudentOverview() {
           </div>
         </Card>
       </div>
+
+      <Card title="Today's classes" link="Timetable">
+        <div className="list">
+          {today.map((subj, i) => {
+            const c = subjectColor[subj] || "var(--muted)";
+            return (
+              <div key={i} className="list-row">
+                <span className="l-ic" style={{ background: `${c}18`, color: c }}><span style={{ display: "grid", placeItems: "center" }}>{I.book}</span></span>
+                <div className="l-main"><div className="l-t">{subj}</div><div className="l-s">Period {i + 1}</div></div>
+                <div className="l-end"><Pill kind="mute">{timetable.periods[i]}</Pill></div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
     </>
   );
 }

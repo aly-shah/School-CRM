@@ -1,14 +1,19 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { I } from "@/components/icons";
-import { getNotifications, markNotificationsRead, getSession } from "@/lib/store";
+import { getNotifications, markNotificationsRead, getSession, getTeacherSession } from "@/lib/store";
 
 export default function NotificationBell({ portal }) {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState([]);
   const ref = useRef(null);
 
-  const target = () => (portal === "parent" ? { roll: getSession() } : portal === "student" ? { roll: "12" } : { audience: portal });
+  const target = () => {
+    if (portal === "parent") return { roll: getSession() };
+    if (portal === "student") return { roll: "12" };
+    if (portal === "teacher") return { audience: "teacher", tid: getTeacherSession()?.id };
+    return { audience: portal };
+  };
 
   const load = () => getNotifications(target()).then(setList).catch(() => {});
   useEffect(() => { load(); const t = setInterval(load, 20000); return () => clearInterval(t); }, [portal]);

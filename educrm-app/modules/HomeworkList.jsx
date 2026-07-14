@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { PageHeader, Card, Pill } from "@/components/ui";
 import { I } from "@/components/icons";
 import { subjectColor } from "@/lib/data";
-import { getHomework, addHomework, submitHomework } from "@/lib/store";
+import { getHomework, addHomework, submitHomework, getTeacherSession } from "@/lib/store";
+import { firstClass } from "@/lib/classes";
 
 const ROLL = "12";
 const SUBJECTS = ["Mathematics", "Science", "English", "Computer", "Social Studies", "Hindi"];
@@ -27,14 +28,17 @@ export default function HomeworkList({ role = "teacher" }) {
   const [subs, setSubs] = useState({});
   const [form, setForm] = useState({ title: "", subject: "Mathematics", due: "Tomorrow", desc: "" });
   const [file, setFile] = useState(null);
+  const [me, setMe] = useState(null);
 
   useEffect(() => {
+    if (isTeacher) setMe(getTeacherSession());
     getHomework().then((all) => {
       setList(all);
       const s = {}; all.forEach((h) => { s[h.id] = (h.subs || []).includes(ROLL); });
       setSubs(s);
     });
   }, []);
+  const myClass = firstClass(me?.classes);
 
   const onFile = (e) => {
     const f = e.target.files?.[0];
@@ -47,7 +51,7 @@ export default function HomeworkList({ role = "teacher" }) {
   const submitForm = async (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
-    const item = { id: Date.now(), title: form.title.trim(), subject: form.subject, cls: "6-B", due: form.due || "This week", desc: form.desc.trim(), attach: file, status: "Open" };
+    const item = { id: Date.now(), title: form.title.trim(), subject: form.subject, cls: myClass, due: form.due || "This week", desc: form.desc.trim(), attach: file, status: "Open", teacherId: me?.id, teacherName: me?.name };
     await addHomework(item);
     setList(await getHomework());
     setForm({ title: "", subject: form.subject, due: "Tomorrow", desc: "" });
@@ -57,7 +61,7 @@ export default function HomeworkList({ role = "teacher" }) {
 
   const doSubmit = async (id) => { setSubs({ ...subs, [id]: true }); await submitHomework(id, ROLL); };
 
-  const subtitle = isTeacher ? "Assign work and attach files for Grade 6-B" : isStudent ? "Your assignments · Grade 6-B" : "Ayaan's assignments · Grade 6-B";
+  const subtitle = isTeacher ? `Assign work and attach files for Grade ${myClass}` : isStudent ? "Your assignments · Grade 6-B" : "Ayaan's assignments · Grade 6-B";
 
   return (
     <>
