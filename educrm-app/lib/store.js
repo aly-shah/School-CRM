@@ -107,6 +107,12 @@ export async function markNotificationsRead(t = {}) {
   await jsend("/api/notifications", "PATCH", t.roll ? { roll: t.roll } : { audience: t.audience, tid: t.tid });
 }
 
+// ---- swipe attendance (alerts parents of absent / on-leave students) ----
+export async function saveSwipeAttendance(grade, entries) {
+  const { data } = await jsend("/api/attendance/notify", "POST", { grade, entries });
+  return data?.alerted || 0;
+}
+
 // ---- fee reminders (files an in-app notification for each student + their parent) ----
 export async function remindFees(items) {
   const { data } = await jsend("/api/fees/remind", "POST", { items });

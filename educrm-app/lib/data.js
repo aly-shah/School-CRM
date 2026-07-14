@@ -39,6 +39,19 @@ export const students = [
     parent: { name: "Mr. Zulfiqar Shah", rel: "Father", phone: "+92 336 9902345" } },
   { id: "2023-0161", name: "Hira Yousaf", grade: "5-C", roll: 14, gender: "Female", status: "Active", attendance: 93, overall: 80.3, grade_letter: "A", rank: 8, feeDue: 0,
     parent: { name: "Mr. Yousaf Ali", rel: "Father", phone: "+92 302 6613478" } },
+  // extra classmates for Grade 6-B (fills out the swipe-attendance deck)
+  { id: "2023-0071", name: "Ahmed Raza", grade: "6-B", roll: 1, gender: "Male", status: "Active", attendance: 95, overall: 84.1, grade_letter: "A", rank: 5, feeDue: 0,
+    parent: { name: "Mr. Raza Hussain", rel: "Father", phone: "+92 300 5561023" } },
+  { id: "2023-0072", name: "Ayesha Noor", grade: "6-B", roll: 2, gender: "Female", status: "Active", attendance: 99, overall: 90.4, grade_letter: "A+", rank: 2, feeDue: 0,
+    parent: { name: "Mrs. Noor Fatima", rel: "Mother", phone: "+92 321 7789456" } },
+  { id: "2023-0073", name: "Farhan Ali", grade: "6-B", roll: 3, gender: "Male", status: "Active", attendance: 82, overall: 71.2, grade_letter: "B", rank: 19, feeDue: 22500,
+    parent: { name: "Mr. Asif Ali", rel: "Father", phone: "+92 333 4412098" } },
+  { id: "2023-0074", name: "Iqra Jamil", grade: "6-B", roll: 4, gender: "Female", status: "Active", attendance: 90, overall: 79.6, grade_letter: "B+", rank: 11, feeDue: 0,
+    parent: { name: "Mr. Jamil Ahmed", rel: "Father", phone: "+92 301 3320147" } },
+  { id: "2023-0075", name: "Hania Malik", grade: "6-B", roll: 9, gender: "Female", status: "Active", attendance: 96, overall: 86.8, grade_letter: "A", rank: 4, feeDue: 0,
+    parent: { name: "Mrs. Saba Malik", rel: "Mother", phone: "+92 345 9980321" } },
+  { id: "2023-0076", name: "Rayan Dawood", grade: "6-B", roll: 10, gender: "Male", status: "Active", attendance: 88, overall: 75.9, grade_letter: "B+", rank: 13, feeDue: 45000,
+    parent: { name: "Mr. Dawood Khan", rel: "Father", phone: "+92 300 6674521" } },
 ];
 
 export const admissions = [

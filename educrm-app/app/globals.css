@@ -77,6 +77,38 @@ a{ color:inherit; text-decoration:none; }
 /* let grid/flex items shrink so wide children (tables) scroll inside their own box instead of pushing the page */
 .grid>*, .tiles>*, .g-2>*, .g-3>*, .g-4>*{ min-width:0; }
 
+/* ---- Tinder-style swipe attendance ---- */
+.swipe-wrap{ max-width:400px; margin:0 auto; }
+.swipe-progress{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; font-size:13px; font-weight:600; color:var(--ink-soft); }
+.swipe-mini{ display:flex; gap:10px; font-size:12.5px; font-weight:700; }
+.swipe-mini .good{ color:var(--good); } .swipe-mini .bad{ color:var(--bad); } .swipe-mini .warn{ color:var(--warn); }
+.swipe-deck{ position:relative; height:min(62vh,470px); margin-bottom:12px; touch-action:none; }
+.swipe-card{ position:absolute; inset:0; border-radius:22px; background:var(--panel); border:1px solid var(--line); box-shadow:0 12px 34px rgba(20,25,40,.14); overflow:hidden; }
+.swipe-card.peek{ background:var(--panel-2); }
+.swipe-card.top{ cursor:grab; user-select:none; display:flex; flex-direction:column; }
+.swipe-card.top:active{ cursor:grabbing; }
+.swipe-photo{ height:56%; background:var(--panel-2); display:grid; place-items:center; overflow:hidden; }
+.swipe-photo img{ width:100%; height:100%; object-fit:cover; display:block; -webkit-user-drag:none; }
+.swipe-body{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:3px; }
+.swipe-name{ font-size:21px; font-weight:750; letter-spacing:-.01em; }
+.swipe-sub{ font-size:13px; color:var(--muted); margin-bottom:8px; }
+.swipe-info{ display:flex; flex-direction:column; gap:6px; }
+.swipe-row{ display:flex; justify-content:space-between; gap:12px; font-size:13px; }
+.swipe-row .k{ color:var(--muted); flex:0 0 auto; }
+.swipe-row .v{ font-weight:600; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.swipe-stamp{ position:absolute; z-index:6; font-size:22px; font-weight:900; letter-spacing:.06em; padding:4px 12px; border:3px solid; border-radius:10px; background:rgba(255,255,255,.7); backdrop-filter:blur(2px); pointer-events:none; }
+.swipe-hint{ text-align:center; font-size:12px; color:var(--muted); margin-bottom:12px; }
+.swipe-acts{ display:flex; gap:10px; justify-content:center; }
+.swipe-btn{ flex:1; max-width:130px; display:flex; flex-direction:column; align-items:center; gap:3px; padding:11px 6px; border-radius:14px; border:1px solid var(--line); background:var(--panel); font-size:12.5px; font-weight:700; cursor:pointer; color:var(--ink-soft); transition:transform .1s, background .15s; }
+.swipe-btn:active{ transform:scale(.94); }
+.swipe-btn span{ font-size:19px; line-height:1; }
+.swipe-btn.good{ color:var(--good); border-color:var(--good); } .swipe-btn.good:hover{ background:var(--good-bg); }
+.swipe-btn.bad{ color:var(--bad); border-color:var(--bad); } .swipe-btn.bad:hover{ background:var(--bad-bg); }
+.swipe-btn.warn{ color:var(--warn); border-color:var(--warn); } .swipe-btn.warn:hover{ background:var(--warn-bg); }
+.swipe-summary{ display:flex; gap:12px; justify-content:center; }
+.swipe-tot{ flex:1; max-width:120px; background:var(--panel-2); border-radius:14px; padding:14px 6px; }
+.swipe-tot .n{ font-size:30px; font-weight:800; } .swipe-tot .l{ font-size:12px; color:var(--muted); margin-top:2px; }
+
 /* WhatsApp click-to-chat button */
 .wa-btn{ display:inline-flex; align-items:center; gap:6px; background:#25d366; border-color:#25d366; color:#0b3d1f; font-weight:700; }
 .wa-btn:hover{ background:#1fbe5b; border-color:#1fbe5b; }

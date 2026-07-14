@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { PageHeader, StatTile, Card, Avatar, Table, Pill } from "@/components/ui";
 import { I } from "@/components/icons";
 import { classRoster, eventMonth } from "@/lib/data";
+import SwipeAttendance from "@/modules/SwipeAttendance";
 
 // deterministic mock history so past days are consistent across reloads
 const statusFor = (roll, day) => {
@@ -18,7 +19,7 @@ const cellStyle = (st) =>
       : { t: "L", c: "var(--warn)", b: "var(--warn-bg)" };
 
 export default function Attendance({ subtitle = "Grade 6-B · Class Teacher: Sadia Karim" }) {
-  const [tab, setTab] = useState("today");
+  const [tab, setTab] = useState("swipe");
 
   // ---- school days this month, up to today ----
   const schoolDays = useMemo(() => {
@@ -69,10 +70,13 @@ export default function Attendance({ subtitle = "Grade 6-B · Class Teacher: Sad
       <PageHeader title="Attendance" subtitle={subtitle} />
 
       <div className="tabs no-print" style={{ marginBottom: 20 }}>
-        {[["today", "Today"], ["history", "History"], ["report", "Monthly report"]].map(([k, l]) => (
+        {[["swipe", "Swipe ✋"], ["today", "Today"], ["history", "History"], ["report", "Monthly report"]].map(([k, l]) => (
           <a key={k} href="#" onClick={(e) => { e.preventDefault(); setTab(k); }} className={tab === k ? "active" : ""}>{l}</a>
         ))}
       </div>
+
+      {/* ---------------- SWIPE (Tinder-style) ---------------- */}
+      {tab === "swipe" && <SwipeAttendance />}
 
       {/* ---------------- TODAY ---------------- */}
       {tab === "today" && (
