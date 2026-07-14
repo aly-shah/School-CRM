@@ -115,6 +115,19 @@ CREATE TABLE IF NOT EXISTS drivers (
   created_at timestamptz DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS teachers (
+  id serial PRIMARY KEY,
+  name text NOT NULL,
+  username text UNIQUE NOT NULL,
+  password text NOT NULL,
+  subject text,
+  classes text,
+  phone text,
+  photo text,
+  status text DEFAULT 'Active',
+  created_at timestamptz DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS vehicle_checks (
   id serial PRIMARY KEY,
   bus text,

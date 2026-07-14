@@ -129,8 +129,14 @@ export async function POST(req) {
         ["Rashid Mehmood", "35201-1234567-1", "+92 300 8433445", "LHR-DL-99213", "Route 1 · North Loop", "LEB-4471", "Active"]);
     }
 
+    // 12. a demo teacher account
+    if ((await count("teachers")) === 0) {
+      await q(`INSERT INTO teachers (name,username,password,subject,classes,phone) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (username) DO NOTHING`,
+        ["Sadia Karim", "sadia", "teacher123", "Mathematics", "6-B, 8-A, 10-A", "+92 300 8412345"]);
+    }
+
     const summary = {};
-    for (const t of ["students", "staff", "classes", "quizzes", "messages", "homework", "library_books", "inventory_items", "drivers"]) {
+    for (const t of ["students", "staff", "classes", "quizzes", "messages", "homework", "library_books", "inventory_items", "drivers", "teachers"]) {
       summary[t] = await count(t);
     }
     return NextResponse.json({ ok: true, seeded: summary });

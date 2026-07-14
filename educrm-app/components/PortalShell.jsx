@@ -9,8 +9,9 @@ import NotificationBell from "@/components/NotificationBell";
 const ChevL = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 6l-6 6 6 6" /></svg>;
 const ChevR = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 6l6 6-6 6" /></svg>;
 
-export default function PortalShell({ portal, children }) {
+export default function PortalShell({ portal, children, userOverride }) {
   const cfg = PORTALS[portal];
+  const user = userOverride || cfg.user;
   const path = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -55,8 +56,10 @@ export default function PortalShell({ portal, children }) {
             <span className="ni-ic">{I.swap}</span><span className="ni-lb">Switch portal</span>
           </Link>
           <div className="rail-user">
-            <div className="rail-av" style={{ background: cfg.accent }}>{cfg.user.initials}</div>
-            <div className="ru-info"><div className="ru-nm">{cfg.user.name}</div><div className="ru-rl">{cfg.user.sub}</div></div>
+            {user.photo
+              ? <img src={user.photo} alt={user.name} className="rail-av" style={{ objectFit: "cover" }} />
+              : <div className="rail-av" style={{ background: cfg.accent }}>{user.initials}</div>}
+            <div className="ru-info"><div className="ru-nm">{user.name}</div><div className="ru-rl">{user.sub}</div></div>
           </div>
         </div>
       </aside>

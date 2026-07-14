@@ -1,12 +1,22 @@
+"use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { PageHeader, Card, StatTile, Pill } from "@/components/ui";
 import { I } from "@/components/icons";
 import { teacherClasses, homework } from "@/lib/data";
+import { getTeacherSession, teacherLogout } from "@/lib/store";
 
 export default function TeacherDashboard() {
+  const [me, setMe] = useState(null);
+  useEffect(() => { setMe(getTeacherSession()); }, []);
+
+  const firstName = me?.name ? me.name.split(" ")[0] : "Teacher";
+  const signOut = () => { teacherLogout(); window.location.href = "/teacher"; };
+
   return (
     <>
-      <PageHeader title="Good morning, Sadia 👋" subtitle="Class Teacher · Grade 6-B · Tuesday, 6 July">
+      <PageHeader title={`Good morning, ${firstName} 👋`} subtitle={me ? `${me.subject || "Teacher"}${me.classes ? " · " + me.classes : ""}` : "Class Teacher"}>
+        <button className="btn" onClick={signOut}>{I.logout}Sign out</button>
         <Link href="/teacher/attendance" className="btn primary"><span style={{ display: "flex" }}>{I.check}</span>Take attendance</Link>
       </PageHeader>
 
@@ -46,8 +56,9 @@ export default function TeacherDashboard() {
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href="/teacher/attendance" className="btn">{I.check}Take attendance</Link>
           <Link href="/teacher/gradebook" className="btn">{I.book}Enter marks</Link>
+          <Link href="/teacher/quizzes" className="btn">{I.quiz}Quizzes</Link>
+          <Link href="/teacher/certificates" className="btn">{I.award}Certificates</Link>
           <Link href="/teacher/homework" className="btn">{I.clipboard}Assign homework</Link>
-          <Link href="/teacher/timetable" className="btn">{I.timetable}My timetable</Link>
         </div>
       </Card>
     </>

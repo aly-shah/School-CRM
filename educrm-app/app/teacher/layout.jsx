@@ -1,4 +1,4 @@
-import PortalShell from "@/components/PortalShell";
+import TeacherGate from "@/components/TeacherGate";
 export default function TeacherLayout({ children }) {
-  return <PortalShell portal="teacher">{children}</PortalShell>;
+  return <TeacherGate>{children}</TeacherGate>;
 }

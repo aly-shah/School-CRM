@@ -28,6 +28,23 @@ export const getDrivers = () => jget("/api/drivers");
 export async function addDriver(d) { const { ok, data } = await jsend("/api/drivers", "POST", d); if (!ok) throw new Error(data.error || "Failed"); return data; }
 export async function setDriverPhoto(id, dataURL) { await jsend(`/api/drivers/${id}`, "PATCH", { photo: dataURL }); }
 
+// ---- teachers (accounts created by admin) ----
+export const getTeachers = () => jget("/api/teachers");
+export async function addTeacher(t) { const { ok, data } = await jsend("/api/teachers", "POST", t); if (!ok) throw new Error(data.error || "Failed"); return data; }
+export async function setTeacherPhoto(id, dataURL) { await jsend(`/api/teachers/${id}`, "PATCH", { photo: dataURL }); }
+export async function teacherLogin(username, password) {
+  const { data } = await jsend("/api/teachers/login", "POST", { username, password });
+  if (data.ok) setTeacherSession(data.teacher);
+  return !!data.ok;
+}
+const K_TSESSION = "educrm_teacher_session";
+export function setTeacherSession(t) { if (typeof window !== "undefined") localStorage.setItem(K_TSESSION, JSON.stringify(t)); }
+export function getTeacherSession() {
+  if (typeof window === "undefined") return null;
+  try { const v = localStorage.getItem(K_TSESSION); return v ? JSON.parse(v) : null; } catch { return null; }
+}
+export function teacherLogout() { if (typeof window !== "undefined") localStorage.removeItem(K_TSESSION); }
+
 // ---- vehicle safety checklist ----
 export const getVehicleCheck = (bus) => jget(`/api/vehicle-checks?bus=${encodeURIComponent(bus)}`);
 export const getVehicleChecks = () => jget(`/api/vehicle-checks`);
