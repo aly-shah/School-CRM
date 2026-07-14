@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { PageHeader, StatTile, Card, Pill, Avatar } from "@/components/ui";
 import { I } from "@/components/icons";
-import { getTeachers, addTeacher } from "@/lib/store";
+import { getTeachers, addTeacher, setTeacherPassword, removeTeacher } from "@/lib/store";
 
 const inp = { padding: "9px 11px", border: "1px solid var(--line)", borderRadius: 9, fontSize: 13.5, fontFamily: "inherit", background: "var(--panel)", color: "var(--ink)", minWidth: 0, boxSizing: "border-box" };
 const blank = { name: "", username: "", password: "", subject: "", classes: "", phone: "" };
@@ -14,8 +14,22 @@ export default function TeacherManagement() {
   const [photo, setPhoto] = useState(null);
   const [err, setErr] = useState("");
   const [created, setCreated] = useState(null);
+  const [resetId, setResetId] = useState(null);   // teacher id being reset
+  const [resetPw, setResetPw] = useState("");
 
   useEffect(() => { getTeachers().then(setList); }, []);
+
+  const saveReset = async (t) => {
+    if (!resetPw.trim()) return;
+    await setTeacherPassword(t.id, resetPw.trim());
+    setCreated({ username: t.username, password: resetPw.trim() });
+    setResetId(null); setResetPw("");
+  };
+  const remove = async (t) => {
+    if (!window.confirm(`Remove ${t.name}? Their login will stop working.`)) return;
+    await removeTeacher(t.id);
+    setList(await getTeachers());
+  };
 
   const onPhoto = (e) => {
     const f = e.target.files?.[0];
@@ -50,7 +64,7 @@ export default function TeacherManagement() {
       {created && (
         <Card style={{ marginBottom: 20, borderColor: "var(--good)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <span className="pill good"><span className="d" />Account created</span>
+            <span className="pill good"><span className="d" />Login ready</span>
             <span className="soft" style={{ fontSize: 13.5 }}>Share these with the teacher — login at <b>/teacher</b>: username <b>{created.username}</b> · password <b>{created.password}</b></span>
           </div>
         </Card>
@@ -100,7 +114,17 @@ export default function TeacherManagement() {
               <Row k="Classes" v={t.classes || "—"} />
               <Row k="Phone" v={t.phone || "—"} />
             </div>
-            <div style={{ marginTop: 12 }}><Pill kind={t.status === "Active" ? "good" : "mute"} dot>{t.status}</Pill></div>
+            <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <Pill kind={t.status === "Active" ? "good" : "mute"} dot>{t.status}</Pill>
+              <button className="btn" style={{ padding: "5px 10px", fontSize: 12, marginLeft: "auto" }} onClick={() => { setResetId(resetId === t.id ? null : t.id); setResetPw(""); }}>{I.lock}Reset password</button>
+              <button className="btn" style={{ padding: "5px 10px", fontSize: 12, color: "var(--bad)", borderColor: "var(--bad)" }} onClick={() => remove(t)}>Remove</button>
+            </div>
+            {resetId === t.id && (
+              <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                <input value={resetPw} onChange={(e) => setResetPw(e.target.value)} placeholder="New password" style={{ ...inp, flex: 1 }} onKeyDown={(e) => e.key === "Enter" && saveReset(t)} autoFocus />
+                <button className="btn primary" style={{ padding: "6px 12px" }} onClick={() => saveReset(t)}>Save</button>
+              </div>
+            )}
           </div>
         ))}
       </div>

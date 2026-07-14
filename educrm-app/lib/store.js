@@ -32,6 +32,8 @@ export async function setDriverPhoto(id, dataURL) { await jsend(`/api/drivers/${
 export const getTeachers = () => jget("/api/teachers");
 export async function addTeacher(t) { const { ok, data } = await jsend("/api/teachers", "POST", t); if (!ok) throw new Error(data.error || "Failed"); return data; }
 export async function setTeacherPhoto(id, dataURL) { await jsend(`/api/teachers/${id}`, "PATCH", { photo: dataURL }); }
+export async function setTeacherPassword(id, password) { await jsend(`/api/teachers/${id}`, "PATCH", { password }); }
+export async function removeTeacher(id) { await jsend(`/api/teachers/${id}`, "DELETE"); }
 export async function teacherLogin(username, password) {
   const { data } = await jsend("/api/teachers/login", "POST", { username, password });
   if (data.ok) setTeacherSession(data.teacher);
